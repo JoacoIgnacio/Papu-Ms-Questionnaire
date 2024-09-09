@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",                // Módulo para compatibilidad
+      "declaration": true,                 // Genera archivos de declaración .d.ts
+      "removeComments": true,              // Elimina los comentarios en el código transpilado
+      "emitDecoratorMetadata": true,       // Emitir metadatos de decoradores
+      "experimentalDecorators": true,      // Habilitar decoradores experimentales
+      "allowSyntheticDefaultImports": true,// Permitir importaciones de módulos comunes
+      "target": "es2017",                  // Target de compilación (compatibilidad con ES2017)
+      "sourceMap": true,                   // Genera un archivo .map para debugging
+      "outDir": "./dist",                  // Directorio de salida para los archivos transpilados
+      "baseUrl": "./",                     // Base para los módulos
+      "incremental": true,                 // Transpilación incremental
+      "skipLibCheck": true,                // Omitir verificación de tipos en archivos de librerías
+      "strict": true,                      // Activar todas las verificaciones estrictas
+      "moduleResolution": "node",          // Resolución de módulos de Node.js
+      "esModuleInterop": true,             // Habilitar interoperabilidad con ES Modules
+      "forceConsistentCasingInFileNames": true, // Forzar nombres de archivo consistentes
+      "strictPropertyInitialization": false // Desactiva la verificación de inicialización estricta
+    },
+    "include": ["src/**/*.ts"],            // Incluye todos los archivos .ts en el directorio src
+    "exclude": ["node_modules"]            // Excluir node_modules
+  }
+  
