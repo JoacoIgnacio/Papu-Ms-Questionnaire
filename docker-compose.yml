@@ -1,9 +1,19 @@
-version: '3'
+version: '3.8'
+
 services:
+  ms-questionnaire:
+    image: ms-questionnaire
+    container_name: ms-questionnaire
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
   mongodb:
     image: mongo
     container_name: ms-questionnaire-mongodb
     ports:
-      - "27017:27017"
+      - "27018:27018"
     volumes:
-      - ./data:/data/db
+      - ./data/db:/data/db
