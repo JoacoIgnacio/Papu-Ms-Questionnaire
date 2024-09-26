@@ -6,7 +6,7 @@ import { ConfigModule} from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal:true,envFilePath:'.env'}),  // Importa el módulo de configur
-    MongooseModule.forRoot(process?.env?.MONGO_URI || ''),  // URL de conexión a MongoDB
+    MongooseModule.forRoot('mongodb+srv://admin:admin@web-movil-questionnarie.3nuzv.mongodb.net/?retryWrites=true&w=majority&appName=Web-Movil-Questionnarie'),  // URL de conexión a MongoDB
     QuestionnaireModule,  // Importa el módulo de cuestionarios
   ],
 })
