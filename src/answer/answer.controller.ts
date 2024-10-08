@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Param, Delete, Get } from '@nestjs/common';
+import { Controller, Post, Body, Param, Delete, Get, UseGuards } from '@nestjs/common';
 import { AnswerService } from './answer.service';
-
+import { CheckTokenGuard } from '../guards/check-token.guard'; //
 @Controller('answers')
+@UseGuards(CheckTokenGuard) // Aplica el Guard a todo el controlador
 export class AnswerController {
   constructor(private readonly answerService: AnswerService) {}
 
