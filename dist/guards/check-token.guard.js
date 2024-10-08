@@ -11,25 +11,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CheckTokenGuard = void 0;
 const common_1 = require("@nestjs/common");
-const rxjs_1 = require("rxjs");
-const config_1 = require("@nestjs/config");
 const axios_1 = require("@nestjs/axios");
+const config_1 = require("@nestjs/config");
+const rxjs_1 = require("rxjs");
 let CheckTokenGuard = class CheckTokenGuard {
     constructor(httpService, configService) {
         this.httpService = httpService;
         this.configService = configService;
-        this.MS_IAM_URL = 'http://localhost:3000';
     }
     async canActivate(context) {
         var _a;
+        const request = context.switchToHttp().getRequest();
+        const token = (_a = request.headers['authorization']) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
+        if (!token) {
+            throw new common_1.UnauthorizedException('No token provided');
+        }
+        const msIamUrl = this.configService.get('MS_IAM_URL') || 'http://localhost:3000';
         try {
-            const request = context.switchToHttp().getRequest();
-            const token = (_a = request.headers[`authorization`]) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
-            const response = await (0, rxjs_1.lastValueFrom)(this.httpService.get(`${this.configService.get(this.MS_IAM_URL)}/auth/check-token`, { headers: { authorization: `Bearer ${token}` } }));
-            return response.data.isValid;
+            const response = await (0, rxjs_1.lastValueFrom)(this.httpService.post(`${msIamUrl}/auth/check-token`, {}, {
+                headers: { Authorization: `Bearer ${token}` },
+            }));
+            return response.status === 200 || response.status === 201;
         }
         catch (error) {
-            throw new common_1.UnauthorizedException();
+            throw new common_1.UnauthorizedException('Invalid token');
         }
     }
 };

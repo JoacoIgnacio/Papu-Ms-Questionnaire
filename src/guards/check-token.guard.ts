@@ -1,30 +1,36 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import { lastValueFrom} from 'rxjs';
-import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class CheckTokenGuard implements CanActivate {
-  private readonly MS_IAM_URL = 'http://localhost:3000';  // Define la URL del microservicio aquí directamente
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    try{
-      const request = context.switchToHttp().getRequest();
-      const token = request.headers[`authorization`]?.split(' ')[1];
+    const request = context.switchToHttp().getRequest();
+    const token = request.headers['authorization']?.split(' ')[1]; // Extraer el token del encabezado Authorization
+
+    if (!token) {
+      throw new UnauthorizedException('No token provided');
+    }
+
+    // Verificar el token con el microservicio de autenticación (ms-iam)
+    const msIamUrl = this.configService.get<string>('MS_IAM_URL') || 'http://localhost:3000'; // URL del microservicio IAM
+    try {
       const response = await lastValueFrom(
-        this.httpService.get(
-          `${this.configService.get<string>(this.MS_IAM_URL)}/auth/check-token`,
-          {headers: {authorization: `Bearer ${token}`}},
-        ),
+        this.httpService.post(`${msIamUrl}/auth/check-token`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
       );
 
-      return response.data.isValid;
-    }catch(error){
-      throw new UnauthorizedException();
+      // Si la respuesta es exitosa y el token es válido (aceptamos tanto 200 como 201)
+      return response.status === 200 || response.status === 201;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
     }
   }
 }

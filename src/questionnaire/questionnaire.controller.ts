@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards } from '@nestjs/common';
 import { QuestionnaireService } from './questionnaire.service';
-
+import { CheckTokenGuard } from '../guards/check-token.guard'; //
 @Controller('questionnaire')
+@UseGuards(CheckTokenGuard) // Aplica el Guard a todo el controlador
 export class QuestionnaireController {
   constructor(private readonly questionnaireService: QuestionnaireService) {}
 
@@ -9,7 +10,12 @@ export class QuestionnaireController {
   create(@Body() createQuestionnaireDto: any) {
     return this.questionnaireService.create(createQuestionnaireDto);
   }
-
+  @Get()
+  async getAllQuestionnaires() {
+    return [
+      { id: 1, title: 'Mi primer cuestionario', questions: ['Pregunta 1', 'Pregunta 2'] },
+    ];
+  }
   @Get()
   findAll() {
     return this.questionnaireService.findAll();
