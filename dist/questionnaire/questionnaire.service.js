@@ -25,8 +25,8 @@ let QuestionnaireService = class QuestionnaireService {
         const createdQuestionnaire = new this.questionnaireModel(createQuestionnaireDto);
         return createdQuestionnaire.save();
     }
-    async findAll() {
-        return this.questionnaireModel.find().exec();
+    async getAllQuestionnaires() {
+        return this.questionnaireModel.find({}, { _id: 1, title: 1 }).exec();
     }
     async findOne(id) {
         return this.questionnaireModel.findById(id).exec();

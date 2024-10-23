@@ -4,7 +4,7 @@ export declare class QuestionnaireService {
     private questionnaireModel;
     constructor(questionnaireModel: Model<Questionnaire>);
     create(createQuestionnaireDto: any): Promise<Questionnaire>;
-    findAll(): Promise<Questionnaire[]>;
+    getAllQuestionnaires(): Promise<any[]>;
     findOne(id: string): Promise<Questionnaire | null>;
     update(id: string, updateQuestionnaireDto: any): Promise<Questionnaire | null>;
     delete(id: string): Promise<any>;

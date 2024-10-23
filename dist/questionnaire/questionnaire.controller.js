@@ -24,12 +24,7 @@ let QuestionnaireController = class QuestionnaireController {
         return this.questionnaireService.create(createQuestionnaireDto);
     }
     async getAllQuestionnaires() {
-        return [
-            { id: 1, title: 'Mi primer cuestionario', questions: ['Pregunta 1', 'Pregunta 2'] },
-        ];
-    }
-    findAll() {
-        return this.questionnaireService.findAll();
+        return this.questionnaireService.getAllQuestionnaires();
     }
     findOne(id) {
         return this.questionnaireService.findOne(id);
@@ -55,12 +50,6 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], QuestionnaireController.prototype, "getAllQuestionnaires", null);
-__decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], QuestionnaireController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
