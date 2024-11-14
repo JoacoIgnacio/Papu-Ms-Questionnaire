@@ -5,10 +5,16 @@ import { Questionnaire } from 'src/questionnaire/questionnaire.schema';
 @Schema()
 export class Answer extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Questionnaire', required: true })
-  questionnaireId: string;
+  questionnaireId: Types.ObjectId;
 
-  @Prop({ type: [String], required: true })
-  answers: string[];
+  @Prop({ type: Types.ObjectId, ref: 'Question', required: true })
+  questionId: Types.ObjectId;
+
+  @Prop({ required: true })
+  response: string;
+
+  @Prop()
+  observations: string;
 }
 
 export const AnswerSchema = SchemaFactory.createForClass(Answer);

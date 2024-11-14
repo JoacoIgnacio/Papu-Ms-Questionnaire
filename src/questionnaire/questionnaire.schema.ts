@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 @Schema()
 export class Questionnaire extends Document {
@@ -9,7 +9,7 @@ export class Questionnaire extends Document {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ type: [String] })
+  @Prop({ type: [Types.ObjectId], ref: 'Question' })
   questions: string[];
 }
 
