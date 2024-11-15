@@ -1,28 +1,23 @@
-import { Controller, Post, Body, Param, Delete, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 import { AnswerService } from './answer.service';
-import { CheckTokenGuard } from '../guards/check-token.guard'; //
+
 @Controller('answers')
-@UseGuards(CheckTokenGuard) // Aplica el Guard a todo el controlador
 export class AnswerController {
   constructor(private readonly answerService: AnswerService) {}
 
-  @Post()
-  create(@Body() createAnswerDto: any) {
-    return this.answerService.create(createAnswerDto);
+  // Crear respuestas para un cuestionario específico
+  @Post(':userId/:questionnaireId')
+  async createResponses(
+    @Param('userId') userId: string,
+    @Param('questionnaireId') questionnaireId: string,
+    @Body() answers: { questionId: string, response: string, observations?: string }[],
+  ) {
+    return this.answerService.createResponses(userId, questionnaireId, answers);
   }
 
-  @Get()
-  findAll() {
-    return this.answerService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.answerService.findOne(id);
-  }
-
-  @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.answerService.delete(id);
+  // Obtener historial de cuestionarios completados por el usuario
+  @Get(':userId/history')
+  async getQuestionnaireHistory(@Param('userId') userId: string) {
+    return this.answerService.getQuestionnaireHistory(userId);
   }
 }

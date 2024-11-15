@@ -9,34 +9,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnswerSchema = exports.Answer = void 0;
+exports.QuestionSchema = exports.Question = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-let Answer = class Answer extends mongoose_2.Document {
+let Question = class Question extends mongoose_2.Document {
 };
-exports.Answer = Answer;
-__decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Questionnaire', required: true }),
-    __metadata("design:type", mongoose_2.Types.ObjectId)
-], Answer.prototype, "questionnaireId", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Question', required: true }),
-    __metadata("design:type", mongoose_2.Types.ObjectId)
-], Answer.prototype, "questionId", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, required: true }),
-    __metadata("design:type", mongoose_2.Types.ObjectId)
-], Answer.prototype, "userId", void 0);
+exports.Question = Question;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
-], Answer.prototype, "response", void 0);
+], Question.prototype, "text", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
-], Answer.prototype, "observations", void 0);
-exports.Answer = Answer = __decorate([
+], Question.prototype, "type", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [String] }),
+    __metadata("design:type", Array)
+], Question.prototype, "options", void 0);
+exports.Question = Question = __decorate([
     (0, mongoose_1.Schema)()
-], Answer);
-exports.AnswerSchema = mongoose_1.SchemaFactory.createForClass(Answer);
-//# sourceMappingURL=answer.schema.js.map
+], Question);
+exports.QuestionSchema = mongoose_1.SchemaFactory.createForClass(Question);
+//# sourceMappingURL=question.schema.js.map

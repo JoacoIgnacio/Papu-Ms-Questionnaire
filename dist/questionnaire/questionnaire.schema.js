@@ -24,7 +24,7 @@ __decorate([
     __metadata("design:type", String)
 ], Questionnaire.prototype, "description", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [String] }),
+    (0, mongoose_1.Prop)({ type: [mongoose_2.Types.ObjectId], ref: 'Question' }),
     __metadata("design:type", Array)
 ], Questionnaire.prototype, "questions", void 0);
 exports.Questionnaire = Questionnaire = __decorate([

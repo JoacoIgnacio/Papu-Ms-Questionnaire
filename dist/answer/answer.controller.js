@@ -15,55 +15,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnswerController = void 0;
 const common_1 = require("@nestjs/common");
 const answer_service_1 = require("./answer.service");
-const check_token_guard_1 = require("../guards/check-token.guard");
 let AnswerController = class AnswerController {
     constructor(answerService) {
         this.answerService = answerService;
     }
-    create(createAnswerDto) {
-        return this.answerService.create(createAnswerDto);
+    async createResponses(userId, questionnaireId, answers) {
+        return this.answerService.createResponses(userId, questionnaireId, answers);
     }
-    findAll() {
-        return this.answerService.findAll();
-    }
-    findOne(id) {
-        return this.answerService.findOne(id);
-    }
-    delete(id) {
-        return this.answerService.delete(id);
+    async getQuestionnaireHistory(userId) {
+        return this.answerService.getQuestionnaireHistory(userId);
     }
 };
 exports.AnswerController = AnswerController;
 __decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Post)(':userId/:questionnaireId'),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Param)('questionnaireId')),
+    __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], AnswerController.prototype, "create", null);
+    __metadata("design:paramtypes", [String, String, Array]),
+    __metadata("design:returntype", Promise)
+], AnswerController.prototype, "createResponses", null);
 __decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], AnswerController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)(':userId/history'),
+    __param(0, (0, common_1.Param)('userId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], AnswerController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], AnswerController.prototype, "delete", null);
+    __metadata("design:returntype", Promise)
+], AnswerController.prototype, "getQuestionnaireHistory", null);
 exports.AnswerController = AnswerController = __decorate([
     (0, common_1.Controller)('answers'),
-    (0, common_1.UseGuards)(check_token_guard_1.CheckTokenGuard),
     __metadata("design:paramtypes", [answer_service_1.AnswerService])
 ], AnswerController);
 //# sourceMappingURL=answer.controller.js.map
