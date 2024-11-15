@@ -7,6 +7,19 @@ import { Answer } from './answer.schema';
 export class AnswerService {
   constructor(@InjectModel(Answer.name) private answerModel: Model<Answer>) {}
 
+  // Crear una respuesta
+  async create(answer: Answer) {
+    const answerWithObjectIds = {
+      userId: new Types.ObjectId(answer.userId),
+      questionnaireId: new Types.ObjectId(answer.questionnaireId),
+      questionId: new Types.ObjectId(answer.questionId),
+      response: answer.response,
+      observations: answer.observations || '',
+    };
+
+    return this.answerModel.create(answerWithObjectIds);
+  }
+
   // Crear respuestas para un cuestionario
   async createResponses(userId: string, questionnaireId: string, answers: { questionId: string, response: string, observations?: string }[]) {
     const answerDocs = answers.map(answer => ({

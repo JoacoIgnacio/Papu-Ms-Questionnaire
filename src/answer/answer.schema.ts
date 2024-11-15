@@ -9,7 +9,7 @@ export class Answer extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Question', required: true })
   questionId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, required: true })
+  @Prop({ type: Types.ObjectId,ref: 'User', required: true })
   userId: Types.ObjectId;
 
   @Prop({ required: true })

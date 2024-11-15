@@ -26,6 +26,7 @@ exports.AnswerModule = AnswerModule = __decorate([
                 { name: question_schema_1.Question.name, schema: question_schema_1.QuestionSchema },
             ]),
         ],
+        exports: [mongoose_1.MongooseModule],
         providers: [answer_service_1.AnswerService],
         controllers: [answer_controller_1.AnswerController],
     })

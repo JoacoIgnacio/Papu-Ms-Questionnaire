@@ -16,14 +16,45 @@ exports.QuestionnaireService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const answer_schema_1 = require("../answer/answer.schema");
 const questionnaire_schema_1 = require("./questionnaire.schema");
 let QuestionnaireService = class QuestionnaireService {
-    constructor(questionnaireModel) {
+    constructor(questionnaireModel, answerModel) {
         this.questionnaireModel = questionnaireModel;
+        this.answerModel = answerModel;
     }
     async create(createQuestionnaireDto) {
         const createdQuestionnaire = new this.questionnaireModel(createQuestionnaireDto);
         return createdQuestionnaire.save();
+    }
+    async getQuestionnaireWithUserAnswers(questionnaireId, userId) {
+        const questionnaire = await this.questionnaireModel
+            .findById(questionnaireId)
+            .populate('questions')
+            .exec();
+        if (!questionnaire) {
+            throw new Error('Questionnaire not found');
+        }
+        const userAnswers = await this.answerModel.find({
+            questionnaireId: new mongoose_2.Types.ObjectId(questionnaireId),
+            userId: new mongoose_2.Types.ObjectId(userId),
+        }).exec();
+        const questionsWithAnswers = questionnaire.questions.map((question) => {
+            const answer = userAnswers.find(ans => ans.questionId.toString() === question._id.toString());
+            return {
+                questionId: question._id,
+                text: question.text,
+                type: question.type,
+                options: question.options,
+                userAnswer: answer ? answer.response : null,
+            };
+        });
+        return {
+            questionnaireId: questionnaire._id,
+            title: questionnaire.title,
+            description: questionnaire.description,
+            questions: questionsWithAnswers,
+        };
     }
     async getAllQuestionnaires() {
         return this.questionnaireModel.find({}, { _id: 1, title: 1 }).exec();
@@ -42,6 +73,8 @@ exports.QuestionnaireService = QuestionnaireService;
 exports.QuestionnaireService = QuestionnaireService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(questionnaire_schema_1.Questionnaire.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, mongoose_1.InjectModel)(answer_schema_1.Answer.name)),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model])
 ], QuestionnaireService);
 //# sourceMappingURL=questionnaire.service.js.map

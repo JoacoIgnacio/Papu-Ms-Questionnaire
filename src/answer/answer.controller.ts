@@ -5,6 +5,11 @@ import { AnswerService } from './answer.service';
 export class AnswerController {
   constructor(private readonly answerService: AnswerService) {}
 
+  @Post() 
+  async create(@Body() createAnswerDto: any) {
+    return this.answerService.create(createAnswerDto);
+  }
+
   // Crear respuestas para un cuestionario específico
   @Post(':userId/:questionnaireId')
   async createResponses(

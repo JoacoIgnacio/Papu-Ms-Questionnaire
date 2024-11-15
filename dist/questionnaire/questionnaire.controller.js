@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.QuestionnaireController = void 0;
 const common_1 = require("@nestjs/common");
 const questionnaire_service_1 = require("./questionnaire.service");
-const check_token_guard_1 = require("../guards/check-token.guard");
 let QuestionnaireController = class QuestionnaireController {
     constructor(questionnaireService) {
         this.questionnaireService = questionnaireService;
@@ -74,7 +73,6 @@ __decorate([
 ], QuestionnaireController.prototype, "delete", null);
 exports.QuestionnaireController = QuestionnaireController = __decorate([
     (0, common_1.Controller)('questionnaire'),
-    (0, common_1.UseGuards)(check_token_guard_1.CheckTokenGuard),
     __metadata("design:paramtypes", [questionnaire_service_1.QuestionnaireService])
 ], QuestionnaireController);
 //# sourceMappingURL=questionnaire.controller.js.map

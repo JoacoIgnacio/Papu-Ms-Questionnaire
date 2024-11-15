@@ -14,6 +14,7 @@ import { AnswerController } from './answer.controller';
       { name: Question.name, schema: QuestionSchema },
     ]),
   ],
+  exports: [MongooseModule],
   providers: [AnswerService],
   controllers: [AnswerController],
 })

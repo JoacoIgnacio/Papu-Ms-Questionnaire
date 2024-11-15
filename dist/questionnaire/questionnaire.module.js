@@ -15,6 +15,7 @@ const questionnaire_schema_1 = require("./questionnaire.schema");
 const check_token_guard_1 = require("../guards/check-token.guard");
 const axios_1 = require("@nestjs/axios");
 const config_1 = require("@nestjs/config");
+const answer_schema_1 = require("../answer/answer.schema");
 let QuestionnaireModule = class QuestionnaireModule {
 };
 exports.QuestionnaireModule = QuestionnaireModule;
@@ -23,7 +24,10 @@ exports.QuestionnaireModule = QuestionnaireModule = __decorate([
         imports: [
             axios_1.HttpModule,
             config_1.ConfigModule,
-            mongoose_1.MongooseModule.forFeature([{ name: questionnaire_schema_1.Questionnaire.name, schema: questionnaire_schema_1.QuestionnaireSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: questionnaire_schema_1.Questionnaire.name, schema: questionnaire_schema_1.QuestionnaireSchema },
+                { name: answer_schema_1.Answer.name, schema: answer_schema_1.AnswerSchema },
+            ]),
         ],
         controllers: [questionnaire_controller_1.QuestionnaireController],
         providers: [questionnaire_service_1.QuestionnaireService, check_token_guard_1.CheckTokenGuard],
