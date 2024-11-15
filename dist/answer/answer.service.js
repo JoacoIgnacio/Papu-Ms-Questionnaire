@@ -21,18 +21,28 @@ let AnswerService = class AnswerService {
     constructor(answerModel) {
         this.answerModel = answerModel;
     }
-    async create(createAnswerDto) {
-        const createdAnswer = new this.answerModel(createAnswerDto);
-        return createdAnswer.save();
+    async createResponses(userId, questionnaireId, answers) {
+        const answerDocs = answers.map(answer => ({
+            userId: new mongoose_2.Types.ObjectId(userId),
+            questionnaireId: new mongoose_2.Types.ObjectId(questionnaireId),
+            questionId: new mongoose_2.Types.ObjectId(answer.questionId),
+            response: answer.response,
+            observations: answer.observations || '',
+        }));
+        return this.answerModel.insertMany(answerDocs);
     }
-    async findAll() {
-        return this.answerModel.find().exec();
-    }
-    async findOne(id) {
-        return this.answerModel.findById(id).exec();
-    }
-    async delete(id) {
-        return this.answerModel.findByIdAndDelete(id).exec();
+    async getQuestionnaireHistory(userId) {
+        return this.answerModel
+            .find({ userId: new mongoose_2.Types.ObjectId(userId) })
+            .populate({
+            path: 'questionnaireId',
+            select: 'title description',
+        })
+            .populate({
+            path: 'questionId',
+            select: 'text type options',
+        })
+            .exec();
     }
 };
 exports.AnswerService = AnswerService;

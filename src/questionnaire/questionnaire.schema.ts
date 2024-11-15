@@ -10,7 +10,7 @@ export class Questionnaire extends Document {
   description: string;
 
   @Prop({ type: [Types.ObjectId], ref: 'Question' })
-  questions: string[];
+  questions: Types.ObjectId[];
 }
 
 export const QuestionnaireSchema = SchemaFactory.createForClass(Questionnaire);

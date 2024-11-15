@@ -17,12 +17,24 @@ let Answer = class Answer extends mongoose_2.Document {
 exports.Answer = Answer;
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Questionnaire', required: true }),
-    __metadata("design:type", String)
+    __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Answer.prototype, "questionnaireId", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [String], required: true }),
-    __metadata("design:type", Array)
-], Answer.prototype, "answers", void 0);
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Question', required: true }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], Answer.prototype, "questionId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User', required: true }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], Answer.prototype, "userId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], Answer.prototype, "response", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Answer.prototype, "observations", void 0);
 exports.Answer = Answer = __decorate([
     (0, mongoose_1.Schema)()
 ], Answer);

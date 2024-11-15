@@ -13,6 +13,8 @@ const axios_1 = require("@nestjs/axios");
 const questionnaire_module_1 = require("./questionnaire/questionnaire.module");
 const config_1 = require("@nestjs/config");
 const check_token_guard_1 = require("./guards/check-token.guard");
+const answer_module_1 = require("./answer/answer.module");
+const question_module_1 = require("./question/question.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -22,6 +24,8 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
             mongoose_1.MongooseModule.forRoot('mongodb+srv://admin:admin@web-movil-questionnarie.3nuzv.mongodb.net/?retryWrites=true&w=majority&appName=Web-Movil-Questionnarie'),
             questionnaire_module_1.QuestionnaireModule,
+            answer_module_1.AnswerModule,
+            question_module_1.QuestionModule,
             axios_1.HttpModule,
         ],
         providers: [check_token_guard_1.CheckTokenGuard],

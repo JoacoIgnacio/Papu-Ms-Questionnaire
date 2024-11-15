@@ -3,7 +3,6 @@ import { QuestionnaireService } from './questionnaire.service';
 import { CheckTokenGuard } from '../guards/check-token.guard'; 
 
 @Controller('questionnaire')
-@UseGuards(CheckTokenGuard) // Aplica el Guard a todo el controlador
 export class QuestionnaireController {
   constructor(private readonly questionnaireService: QuestionnaireService) {}
 

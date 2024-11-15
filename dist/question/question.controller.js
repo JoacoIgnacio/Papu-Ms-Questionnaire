@@ -12,67 +12,67 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QuestionnaireController = void 0;
+exports.QuestionController = void 0;
 const common_1 = require("@nestjs/common");
-const questionnaire_service_1 = require("./questionnaire.service");
-let QuestionnaireController = class QuestionnaireController {
-    constructor(questionnaireService) {
-        this.questionnaireService = questionnaireService;
+const question_service_1 = require("./question.service");
+let QuestionController = class QuestionController {
+    constructor(questionService) {
+        this.questionService = questionService;
     }
-    create(createQuestionnaireDto) {
-        return this.questionnaireService.create(createQuestionnaireDto);
+    async create(createQuestionDto) {
+        return this.questionService.create(createQuestionDto);
     }
-    async getAllQuestionnaires() {
-        return this.questionnaireService.getAllQuestionnaires();
+    async findAll() {
+        return this.questionService.findAll();
     }
-    findOne(id) {
-        return this.questionnaireService.findOne(id);
+    async findOne(id) {
+        return this.questionService.findOne(id);
     }
-    update(id, updateQuestionnaireDto) {
-        return this.questionnaireService.update(id, updateQuestionnaireDto);
+    async update(id, updateQuestionDto) {
+        return this.questionService.update(id, updateQuestionDto);
     }
-    delete(id) {
-        return this.questionnaireService.delete(id);
+    async delete(id) {
+        return this.questionService.delete(id);
     }
 };
-exports.QuestionnaireController = QuestionnaireController;
+exports.QuestionController = QuestionController;
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], QuestionnaireController.prototype, "create", null);
+    __metadata("design:returntype", Promise)
+], QuestionController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], QuestionnaireController.prototype, "getAllQuestionnaires", null);
+], QuestionController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], QuestionnaireController.prototype, "findOne", null);
+    __metadata("design:returntype", Promise)
+], QuestionController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Put)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", void 0)
-], QuestionnaireController.prototype, "update", null);
+    __metadata("design:returntype", Promise)
+], QuestionController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], QuestionnaireController.prototype, "delete", null);
-exports.QuestionnaireController = QuestionnaireController = __decorate([
-    (0, common_1.Controller)('questionnaire'),
-    __metadata("design:paramtypes", [questionnaire_service_1.QuestionnaireService])
-], QuestionnaireController);
-//# sourceMappingURL=questionnaire.controller.js.map
+    __metadata("design:returntype", Promise)
+], QuestionController.prototype, "delete", null);
+exports.QuestionController = QuestionController = __decorate([
+    (0, common_1.Controller)('questions'),
+    __metadata("design:paramtypes", [question_service_1.QuestionService])
+], QuestionController);
+//# sourceMappingURL=question.controller.js.map

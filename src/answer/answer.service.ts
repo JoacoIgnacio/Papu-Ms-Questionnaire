@@ -1,55 +1,50 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Answer } from './answer.schema';
-import { Questionnaire } from 'src/questionnaire/questionnaire.schema';
-import { Question } from 'src/question/question.schema';
 
 @Injectable()
 export class AnswerService {
-  constructor(
-    @InjectModel(Answer.name) private answerModel: Model<Answer>,
-    @InjectModel(Questionnaire.name) private questionnaireModel: Model<Questionnaire>,
-    @InjectModel(Question.name) private questionModel: Model<Question>,
-  ) {}
+  constructor(@InjectModel(Answer.name) private answerModel: Model<Answer>) {}
 
-  async create(createAnswerDto: any): Promise<Answer> {
-    const { questionnaireId, questionId, response, observations } = createAnswerDto;
+  // Crear una respuesta
+  async create(answer: Answer) {
+    const answerWithObjectIds = {
+      userId: new Types.ObjectId(answer.userId),
+      questionnaireId: new Types.ObjectId(answer.questionnaireId),
+      questionId: new Types.ObjectId(answer.questionId),
+      response: answer.response,
+      observations: answer.observations || '',
+    };
 
-    // Verificar si el cuestionario existe, si no, crearlo
-    let questionnaire = await this.questionnaireModel.findById(questionnaireId).exec();
-    if (!questionnaire) {
-      questionnaire = new this.questionnaireModel({ _id: questionnaireId, title: 'Nuevo Cuestionario', description: 'Descripción del cuestionario' });
-      await questionnaire.save();
-    }
-
-    // Verificar si la pregunta existe, si no, crearla
-    let question = await this.questionModel.findById(questionId).exec();
-    if (!question) {
-      question = new this.questionModel({ _id: questionId, text: 'Nueva Pregunta', type: 'Tipo de pregunta' });
-      await question.save();
-    }
-
-    // Crear la respuesta
-    const createdAnswer = new this.answerModel({
-      questionnaireId: questionnaire._id,
-      questionId: question._id,
-      response,
-      observations,
-    });
-
-    return createdAnswer.save();
+    return this.answerModel.create(answerWithObjectIds);
   }
 
-  async findAll(): Promise<Answer[]> {
-    return this.answerModel.find().exec();
+  // Crear respuestas para un cuestionario
+  async createResponses(userId: string, questionnaireId: string, answers: { questionId: string, response: string, observations?: string }[]) {
+    const answerDocs = answers.map(answer => ({
+      userId: new Types.ObjectId(userId),
+      questionnaireId: new Types.ObjectId(questionnaireId),
+      questionId: new Types.ObjectId(answer.questionId),
+      response: answer.response,
+      observations: answer.observations || '',
+    }));
+
+    return this.answerModel.insertMany(answerDocs);
   }
 
-  async findOne(id: string): Promise<Answer | null> {
-    return this.answerModel.findById(id).exec();
-  }
-
-  async delete(id: string): Promise<any> {
-    return this.answerModel.findByIdAndDelete(id).exec();
+  // Obtener historial de cuestionarios completados por un usuario
+  async getQuestionnaireHistory(userId: string) {
+    return this.answerModel
+      .find({ userId: new Types.ObjectId(userId) })
+      .populate({
+        path: 'questionnaireId',
+        select: 'title description',
+      })
+      .populate({
+        path: 'questionId',
+        select: 'text type options',
+      })
+      .exec();
   }
 }
