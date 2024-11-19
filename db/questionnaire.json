@@ -1,0 +1,10 @@
+{
+    "_id": "ObjectId",
+    "title": "Check List Conductores",
+    "description": "Comercializadora Ltda.",
+    "questions": [
+      "ObjectId('question1')",
+      "ObjectId('question2')",
+      "ObjectId('question3')"
+    ]
+  }
