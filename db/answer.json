@@ -1,0 +1,9 @@
+{
+    "_id": "ObjectId",
+    "questionaireAnswerId": "ObjectId('questionnaireAnswer1')",
+    "questionId": "ObjectId('question1')",
+    "userId": "ObjectId('user1')",
+    "response": "Sí",
+    "observations": "Durmió menos debido a viaje prolongado"
+  }
+  

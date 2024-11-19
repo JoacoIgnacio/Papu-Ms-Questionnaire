@@ -2,15 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Answer } from './answer.schema';
-<<<<<<< Updated upstream
-
-@Injectable()
-export class AnswerService {
-  constructor(@InjectModel(Answer.name) private answerModel: Model<Answer>) {}
-=======
+import { questionnaireAnswer } from 'src/questionnaireAnswer/questionnaireAnswer.schema';
 import { Questionnaire } from 'src/questionnaire/questionnaire.schema';
 import { Question } from 'src/question/question.schema';
-import { questionnaireAnswer } from 'src/questionnaireAnswer/questionnaireAnswer.schema';
 
 @Injectable()
 export class AnswerService {
@@ -20,32 +14,38 @@ export class AnswerService {
     @InjectModel(Question.name) private questionModel: Model<Question>,
     @InjectModel('QuestionnaireAnswer') private questionnaireAnswerModel: Model<questionnaireAnswer>,
   ) {}
->>>>>>> Stashed changes
 
-  // Crear una respuesta
-  async create(answer: Answer) {
-    const answerWithObjectIds = {
-      userId: new Types.ObjectId(answer.userId),
-      questionnaireId: new Types.ObjectId(answer.questionnaireId),
-      questionId: new Types.ObjectId(answer.questionId),
-      response: answer.response,
-      observations: answer.observations || '',
-    };
+  async create(createAnswerDto: any): Promise<Answer> {
+    const { questionnaireId, questionId, response, observations } = createAnswerDto;
 
-    return this.answerModel.create(answerWithObjectIds);
-  }
+    // Verificar si la pregunta existe, si no, crearla
+    let question = await this.questionModel.findById(questionId).exec();
+    if (!question) {
+      question = new this.questionModel({ _id: questionId, text: 'Nueva Pregunta', type: 'Tipo de pregunta' });
+      await question.save();
+    }
 
-  // Crear respuestas para un cuestionario
-  async createResponses(userId: string, questionnaireId: string, answers: { questionId: string, response: string, observations?: string }[]) {
-    const answerDocs = answers.map(answer => ({
-      userId: new Types.ObjectId(userId),
-      questionnaireId: new Types.ObjectId(questionnaireId),
-      questionId: new Types.ObjectId(answer.questionId),
-      response: answer.response,
-      observations: answer.observations || '',
-    }));
+    // Crear la respuesta
+    const createdAnswer = new this.answerModel({
+      questionnaireAnswerId: null, // Inicialmente null, se actualizará después
+      questionId: question._id,
+      response,
+      observations,
+    });
 
-    return this.answerModel.insertMany(answerDocs);
+    // Relacionar la respuesta con el cuestionario
+    const questionnaireAnswer = new this.questionnaireAnswerModel({
+      questionnaireId: questionnaireId,
+      answerId: createdAnswer._id,
+    });
+
+    await questionnaireAnswer.save();
+
+    // Asignar el questionnaireAnswerId al createdAnswer
+    createdAnswer.questionnaireAnswerId = questionnaireAnswer._id;
+    await createdAnswer.save();
+
+    return createdAnswer;
   }
 
   // Obtener historial de cuestionarios completados por un usuario

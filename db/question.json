@@ -1,0 +1,7 @@
+{
+    "_id": "ObjectId('question1')",
+    "text": "¿Ha dormido menos de 6 hrs en las últimas 24 hrs?",
+    "type": "checkbox",
+    "options": ["Sí", "No"]
+  }
+  
