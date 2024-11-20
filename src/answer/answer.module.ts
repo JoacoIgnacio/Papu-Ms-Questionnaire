@@ -5,6 +5,7 @@ import { Questionnaire, QuestionnaireSchema } from 'src/questionnaire/questionna
 import { Question, QuestionSchema } from 'src/question/question.schema';
 import { AnswerService } from './answer.service';
 import { AnswerController } from './answer.controller';
+import { QuestionnaireAnswerSchema } from 'src/questionnaireAnswer/questionnaireAnswer.schema';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AnswerController } from './answer.controller';
       { name: Answer.name, schema: AnswerSchema },
       { name: Questionnaire.name, schema: QuestionnaireSchema },
       { name: Question.name, schema: QuestionSchema },
+      { name: 'QuestionnaireAnswer', schema: QuestionnaireAnswerSchema },
     ]),
   ],
   exports: [MongooseModule],

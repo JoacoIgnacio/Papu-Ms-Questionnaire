@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Answer } from './answer.schema';
-import { questionnaireAnswer } from 'src/questionnaireAnswer/questionnaireAnswer.schema';
+import { QuestionnaireAnswer } from 'src/questionnaireAnswer/questionnaireAnswer.schema';
 import { Questionnaire } from 'src/questionnaire/questionnaire.schema';
 import { Question } from 'src/question/question.schema';
 
@@ -12,7 +12,7 @@ export class AnswerService {
     @InjectModel(Answer.name) private answerModel: Model<Answer>,
     @InjectModel(Questionnaire.name) private questionnaireModel: Model<Questionnaire>,
     @InjectModel(Question.name) private questionModel: Model<Question>,
-    @InjectModel('QuestionnaireAnswer') private questionnaireAnswerModel: Model<questionnaireAnswer>,
+    @InjectModel('QuestionnaireAnswer') private questionnaireAnswerModel: Model<QuestionnaireAnswer>,
   ) {}
 
   async create(createAnswerDto: any): Promise<Answer> {

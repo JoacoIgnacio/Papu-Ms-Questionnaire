@@ -10,15 +10,6 @@ export class AnswerController {
     return this.answerService.create(createAnswerDto);
   }
 
-  // Crear respuestas para un cuestionario específico
-  @Post(':userId/:questionnaireId')
-  async createResponses(
-    @Param('userId') userId: string,
-    @Param('questionnaireId') questionnaireId: string,
-    @Body() answers: { questionId: string, response: string, observations?: string }[],
-  ) {
-    return this.answerService.createResponses(userId, questionnaireId, answers);
-  }
 
   // Obtener historial de cuestionarios completados por el usuario
   @Get(':userId/history')
