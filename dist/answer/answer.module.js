@@ -14,6 +14,7 @@ const questionnaire_schema_1 = require("../questionnaire/questionnaire.schema");
 const question_schema_1 = require("../question/question.schema");
 const answer_service_1 = require("./answer.service");
 const answer_controller_1 = require("./answer.controller");
+const questionnaireAnswer_schema_1 = require("../questionnaireAnswer/questionnaireAnswer.schema");
 let AnswerModule = class AnswerModule {
 };
 exports.AnswerModule = AnswerModule;
@@ -24,6 +25,7 @@ exports.AnswerModule = AnswerModule = __decorate([
                 { name: answer_schema_1.Answer.name, schema: answer_schema_1.AnswerSchema },
                 { name: questionnaire_schema_1.Questionnaire.name, schema: questionnaire_schema_1.QuestionnaireSchema },
                 { name: question_schema_1.Question.name, schema: question_schema_1.QuestionSchema },
+                { name: 'QuestionnaireAnswer', schema: questionnaireAnswer_schema_1.QuestionnaireAnswerSchema },
             ]),
         ],
         exports: [mongoose_1.MongooseModule],

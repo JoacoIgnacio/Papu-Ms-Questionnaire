@@ -6,18 +6,6 @@ export declare class QuestionnaireService {
     private answerModel;
     constructor(questionnaireModel: Model<Questionnaire>, answerModel: Model<Answer>);
     create(createQuestionnaireDto: any): Promise<Questionnaire>;
-    getQuestionnaireWithUserAnswers(questionnaireId: string, userId: string): Promise<{
-        questionnaireId: any;
-        title: string;
-        description: string;
-        questions: {
-            questionId: any;
-            text: any;
-            type: any;
-            options: any;
-            userAnswer: string | null;
-        }[];
-    }>;
     getAllQuestionnaires(): Promise<any[]>;
     findOne(id: string): Promise<Questionnaire | null>;
     update(id: string, updateQuestionnaireDto: any): Promise<Questionnaire | null>;

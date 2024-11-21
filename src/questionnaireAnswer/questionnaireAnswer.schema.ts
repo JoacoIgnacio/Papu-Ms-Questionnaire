@@ -8,6 +8,9 @@ export class QuestionnaireAnswer {
   
     @Prop({ type: Types.ObjectId, ref: 'Answer', required: true })
     answerId: Types.ObjectId;
+
+    @Prop({ required: true })
+    date: string;
 }
 
 export const QuestionnaireAnswerSchema = SchemaFactory.createForClass(QuestionnaireAnswer);

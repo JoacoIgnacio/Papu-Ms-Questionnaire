@@ -19,23 +19,27 @@ let AnswerController = class AnswerController {
     constructor(answerService) {
         this.answerService = answerService;
     }
-    async createResponses(userId, questionnaireId, answers) {
-        return this.answerService.createResponses(userId, questionnaireId, answers);
+    async create(createAnswerDto) {
+        return this.answerService.create(createAnswerDto);
     }
     async getQuestionnaireHistory(userId) {
         return this.answerService.getQuestionnaireHistory(userId);
     }
+    async getQuestionnairesCompletedByUser(userId) {
+        return this.answerService.getQuestionnairesCompletedByUser(userId);
+    }
+    async getUserAnswersForQuestionnaire(userId, questionnaireId, date) {
+        return this.answerService.getUserAnswersForQuestionnaire(userId, questionnaireId, date);
+    }
 };
 exports.AnswerController = AnswerController;
 __decorate([
-    (0, common_1.Post)(':userId/:questionnaireId'),
-    __param(0, (0, common_1.Param)('userId')),
-    __param(1, (0, common_1.Param)('questionnaireId')),
-    __param(2, (0, common_1.Body)()),
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, Array]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], AnswerController.prototype, "createResponses", null);
+], AnswerController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(':userId/history'),
     __param(0, (0, common_1.Param)('userId')),
@@ -43,6 +47,22 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AnswerController.prototype, "getQuestionnaireHistory", null);
+__decorate([
+    (0, common_1.Get)(':userId/questionnaires'),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AnswerController.prototype, "getQuestionnairesCompletedByUser", null);
+__decorate([
+    (0, common_1.Get)(':userId/:questionnaireId'),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Param)('questionnaireId')),
+    __param(2, (0, common_1.Query)('date')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:returntype", Promise)
+], AnswerController.prototype, "getUserAnswersForQuestionnaire", null);
 exports.AnswerController = AnswerController = __decorate([
     (0, common_1.Controller)('answers'),
     __metadata("design:paramtypes", [answer_service_1.AnswerService])

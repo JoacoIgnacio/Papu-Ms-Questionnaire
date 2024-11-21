@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get,Query } from '@nestjs/common';
 import { AnswerService } from './answer.service';
 
 @Controller('answers')
@@ -10,10 +10,23 @@ export class AnswerController {
     return this.answerService.create(createAnswerDto);
   }
 
-
   // Obtener historial de cuestionarios completados por el usuario
   @Get(':userId/history')
   async getQuestionnaireHistory(@Param('userId') userId: string) {
     return this.answerService.getQuestionnaireHistory(userId);
+  }
+
+  @Get(':userId/questionnaires')
+  async getQuestionnairesCompletedByUser(@Param('userId') userId: string) {
+    return this.answerService.getQuestionnairesCompletedByUser(userId);
+  }
+
+  @Get(':userId/:questionnaireId')
+  async getUserAnswersForQuestionnaire(
+    @Param('userId') userId: string,
+    @Param('questionnaireId') questionnaireId: string,
+    @Query('date') date: string
+  ) {
+    return this.answerService.getUserAnswersForQuestionnaire(userId, questionnaireId, date);
   }
 }

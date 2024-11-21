@@ -1,6 +1,6 @@
 import { Document, Types } from 'mongoose';
 export declare class Answer extends Document {
-    questionnaireId: Types.ObjectId;
+    questionnaireAnswerId: Types.ObjectId;
     questionId: Types.ObjectId;
     userId: Types.ObjectId;
     response: string;

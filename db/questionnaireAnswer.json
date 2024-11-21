@@ -1,5 +1,6 @@
 {
     "_id": "ObjectId('session1')",
     "questionnaireId": "ObjectId('questionnaire1')",
-    "answerId": "ObjectId('answer1')"
+    "answerId": "ObjectId('answer1')",
+    "date": "2021-01-01"
   }

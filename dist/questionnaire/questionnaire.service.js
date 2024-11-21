@@ -27,35 +27,6 @@ let QuestionnaireService = class QuestionnaireService {
         const createdQuestionnaire = new this.questionnaireModel(createQuestionnaireDto);
         return createdQuestionnaire.save();
     }
-    async getQuestionnaireWithUserAnswers(questionnaireId, userId) {
-        const questionnaire = await this.questionnaireModel
-            .findById(questionnaireId)
-            .populate('questions')
-            .exec();
-        if (!questionnaire) {
-            throw new Error('Questionnaire not found');
-        }
-        const userAnswers = await this.answerModel.find({
-            questionnaireId: new mongoose_2.Types.ObjectId(questionnaireId),
-            userId: new mongoose_2.Types.ObjectId(userId),
-        }).exec();
-        const questionsWithAnswers = questionnaire.questions.map((question) => {
-            const answer = userAnswers.find(ans => ans.questionId.toString() === question._id.toString());
-            return {
-                questionId: question._id,
-                text: question.text,
-                type: question.type,
-                options: question.options,
-                userAnswer: answer ? answer.response : null,
-            };
-        });
-        return {
-            questionnaireId: questionnaire._id,
-            title: questionnaire.title,
-            description: questionnaire.description,
-            questions: questionsWithAnswers,
-        };
-    }
     async getAllQuestionnaires() {
         return this.questionnaireModel.find({}, { _id: 1, title: 1 }).exec();
     }

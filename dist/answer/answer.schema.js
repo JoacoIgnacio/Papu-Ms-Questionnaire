@@ -18,7 +18,7 @@ exports.Answer = Answer;
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Questionnaire', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
-], Answer.prototype, "questionnaireId", void 0);
+], Answer.prototype, "questionnaireAnswerId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Question', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
