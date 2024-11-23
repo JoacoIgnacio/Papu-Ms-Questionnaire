@@ -20,4 +20,5 @@ export declare class AnswerService {
     getUserAnswersForQuestionnaire(userId: string, questionnaireId: string, _date: string): Promise<Omit<import("mongoose").Document<unknown, {}, Answer> & Answer & {
         _id: Types.ObjectId;
     }, never>[]>;
+    createImage(createAnswerDto: any): Promise<Answer>;
 }

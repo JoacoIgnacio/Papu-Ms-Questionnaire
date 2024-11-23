@@ -19,6 +19,8 @@ const mongoose_2 = require("mongoose");
 const answer_schema_1 = require("./answer.schema");
 const questionnaire_schema_1 = require("../questionnaire/questionnaire.schema");
 const question_schema_1 = require("../question/question.schema");
+const fs = require('fs');
+const path = require('path');
 let AnswerService = class AnswerService {
     constructor(answerModel, questionnaireModel, questionModel, questionnaireAnswerModel) {
         this.answerModel = answerModel;
@@ -37,11 +39,12 @@ let AnswerService = class AnswerService {
             questionnaireAnswerId: null,
             questionId: question._id,
             userId: new mongoose_2.Types.ObjectId(createAnswerDto.userId),
-            response,
+            response: response,
             observations,
         });
         const now = new Date();
         now.setSeconds(0, 0);
+        now.setHours(now.getHours() - 3);
         const questionnaireAnswer = new this.questionnaireAnswerModel({
             questionnaireId: new mongoose_2.Types.ObjectId(questionnaireId),
             answerId: createdAnswer._id,
@@ -89,12 +92,16 @@ let AnswerService = class AnswerService {
             .exec();
         const uniqueQuestionnaires = new Map();
         questionnaireAnswers.forEach(qa => {
-            uniqueQuestionnaires.set(qa.questionnaireId._id.toString(), {
-                questionnaire: qa.questionnaireId,
-                date: qa.date
-            });
+            const key = `${qa.questionnaireId._id.toString()}_${qa.date}`;
+            if (!uniqueQuestionnaires.has(key)) {
+                uniqueQuestionnaires.set(key, {
+                    questionnaire: qa.questionnaireId,
+                    date: qa.date
+                });
+            }
         });
-        return Array.from(uniqueQuestionnaires.values());
+        const sortedQuestionnaires = Array.from(uniqueQuestionnaires.values()).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        return sortedQuestionnaires;
     }
     async getUserAnswersForQuestionnaire(userId, questionnaireId, _date) {
         const answers = await this.answerModel
@@ -122,6 +129,54 @@ let AnswerService = class AnswerService {
         })
             .exec();
         return userAnswers;
+    }
+    async createImage(createAnswerDto) {
+        const { questionnaireId, questionId, userId, response, observations, images } = createAnswerDto;
+        let question = await this.questionModel.findById(questionId).exec();
+        if (!question) {
+            question = new this.questionModel({ _id: questionId, text: 'Nueva Pregunta', type: 'Tipo de pregunta' });
+            await question.save();
+        }
+        const createdAnswer = new this.answerModel({
+            questionnaireAnswerId: null,
+            questionId: question._id,
+            userId: new mongoose_2.Types.ObjectId(userId),
+            response: response,
+            images: []
+        });
+        if (images && images.length > 0) {
+            const uploadDir = path.join(__dirname, '..', '..', 'upload');
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+            createdAnswer.images = images.map((base64Image, index) => {
+                const matches = base64Image.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
+                if (!matches || matches.length !== 3) {
+                    throw new Error('Invalid base64 image format');
+                }
+                const imageBuffer = Buffer.from(matches[2], 'base64');
+                const imageType = matches[1];
+                const imageName = `${createdAnswer._id}_${index}.${imageType}`;
+                const imagePath = path.join(uploadDir, imageName);
+                fs.writeFileSync(imagePath, imageBuffer);
+                return imagePath;
+            });
+        }
+        await createdAnswer.save();
+        const now = new Date();
+        now.setSeconds(0, 0);
+        now.setHours(now.getHours() - 3);
+        const questionnaireAnswer = new this.questionnaireAnswerModel({
+            questionnaireId: new mongoose_2.Types.ObjectId(questionnaireId),
+            answerId: createdAnswer._id,
+            date: now.toISOString(),
+        });
+        console.log(questionnaireAnswer._id);
+        await questionnaireAnswer.save();
+        console.log(questionnaireAnswer._id);
+        createdAnswer.questionnaireAnswerId = questionnaireAnswer._id;
+        await createdAnswer.save();
+        return createdAnswer;
     }
 };
 exports.AnswerService = AnswerService;

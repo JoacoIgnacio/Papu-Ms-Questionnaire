@@ -5,6 +5,8 @@ import { Answer } from './answer.schema';
 import { QuestionnaireAnswer } from 'src/questionnaireAnswer/questionnaireAnswer.schema';
 import { Questionnaire } from 'src/questionnaire/questionnaire.schema';
 import { Question } from 'src/question/question.schema';
+const fs = require('fs');
+const path = require('path');
 
 @Injectable()
 export class AnswerService {
@@ -13,6 +15,7 @@ export class AnswerService {
     @InjectModel(Questionnaire.name) private questionnaireModel: Model<Questionnaire>,
     @InjectModel(Question.name) private questionModel: Model<Question>,
     @InjectModel('QuestionnaireAnswer') private questionnaireAnswerModel: Model<QuestionnaireAnswer>,
+    
   ) {}
 
   async create(createAnswerDto: any): Promise<Answer> {
@@ -32,13 +35,15 @@ export class AnswerService {
       questionnaireAnswerId: null, // Inicialmente null, se actualizará después
       questionId: question._id,
       userId: new Types.ObjectId(createAnswerDto.userId),
-      response,
+      response: response,
       observations,
     });
 
     // Relacionar la respuesta con el cuestionario
     const now = new Date();
     now.setSeconds(0, 0); // Eliminar segundos y milisegundos
+
+    now.setHours(now.getHours() - 3); // Restar 5 horas a la hora actual
 
     const questionnaireAnswer = new this.questionnaireAnswerModel({
       questionnaireId: new Types.ObjectId(questionnaireId),
@@ -102,16 +107,22 @@ export class AnswerService {
       })
       .exec();
 
-    // Extraer y devolver solo los cuestionarios, eliminando duplicados
+    // Extraer y devolver solo los cuestionarios, eliminando duplicados con la misma fecha
     const uniqueQuestionnaires = new Map();
     questionnaireAnswers.forEach(qa => {
-      uniqueQuestionnaires.set(qa.questionnaireId._id.toString(), {
+      const key = `${qa.questionnaireId._id.toString()}_${qa.date}`;
+      if (!uniqueQuestionnaires.has(key)) {
+      uniqueQuestionnaires.set(key, {
         questionnaire: qa.questionnaireId,
         date: qa.date
       });
+      }
     });
 
-    return Array.from(uniqueQuestionnaires.values());
+    // Convertir a array y ordenar por fecha
+    const sortedQuestionnaires = Array.from(uniqueQuestionnaires.values()).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return sortedQuestionnaires;
   }
   // Obtener respuestas de un usuario a un cuestionario específico en una fecha específica
   async getUserAnswersForQuestionnaire(userId: string, questionnaireId: string, _date: string) {
@@ -151,5 +162,78 @@ export class AnswerService {
       .exec();
 
     return userAnswers;
+  }
+
+  async createImage(createAnswerDto: any): Promise<Answer> {
+    const { questionnaireId, questionId, userId, response, observations, images } = createAnswerDto;
+
+    // Verificar si la pregunta existe, si no, crearla
+    let question = await this.questionModel.findById(questionId).exec();
+
+    if (!question) {
+      question = new this.questionModel({ _id: questionId, text: 'Nueva Pregunta', type: 'Tipo de pregunta' });
+      await question.save();
+    }
+
+     // Crear la respuesta
+     const createdAnswer = new this.answerModel({
+      questionnaireAnswerId: null, // Inicialmente null, se actualizará después
+      questionId: question._id,
+      userId: new Types.ObjectId(userId),
+      response: response,
+      images: []
+    // Convertir la imagen de base64 a un archivo y guardarla en la carpeta upload
+    });
+
+    if (images && images.length > 0) {
+      const uploadDir = path.join(__dirname, '..', '..', 'upload');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      createdAnswer.images = images.map((base64Image: string, index: number) => {
+        const matches = base64Image.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
+        if (!matches || matches.length !== 3) {
+          throw new Error('Invalid base64 image format');
+        }
+
+        const imageBuffer = Buffer.from(matches[2], 'base64');
+        const imageType = matches[1];
+        const imageName = `${createdAnswer._id}_${index}.${imageType}`;
+        const imagePath = path.join(uploadDir, imageName);
+        
+        fs.writeFileSync(imagePath, imageBuffer);
+
+        return imagePath;
+      });
+    }
+    
+
+   
+
+    await createdAnswer.save();
+
+    // Relacionar la respuesta con el cuestionario
+    const now = new Date();
+    now.setSeconds(0, 0); // Eliminar segundos y milisegundos
+
+    now.setHours(now.getHours() - 3); // Restar 5 horas a la hora actual
+
+    const questionnaireAnswer = new this.questionnaireAnswerModel({
+      questionnaireId: new Types.ObjectId(questionnaireId),
+      answerId: createdAnswer._id,
+      date: now.toISOString(),
+    });
+
+    console.log(questionnaireAnswer._id);
+
+    await questionnaireAnswer.save();
+    console.log(questionnaireAnswer._id);
+    // Asignar el questionnaireAnswerId al createdAnswer
+    createdAnswer.questionnaireAnswerId = questionnaireAnswer._id;
+
+    await createdAnswer.save();
+
+    return createdAnswer;
   }
 }

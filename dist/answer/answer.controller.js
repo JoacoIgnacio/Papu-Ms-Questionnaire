@@ -22,6 +22,9 @@ let AnswerController = class AnswerController {
     async create(createAnswerDto) {
         return this.answerService.create(createAnswerDto);
     }
+    async createImage(createAnswerDto) {
+        return this.answerService.createImage(createAnswerDto);
+    }
     async getQuestionnaireHistory(userId) {
         return this.answerService.getQuestionnaireHistory(userId);
     }
@@ -40,6 +43,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AnswerController.prototype, "create", null);
+__decorate([
+    (0, common_1.Post)('upload'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AnswerController.prototype, "createImage", null);
 __decorate([
     (0, common_1.Get)(':userId/history'),
     __param(0, (0, common_1.Param)('userId')),

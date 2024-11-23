@@ -1,5 +1,7 @@
-import { Controller, Post, Body, Param, Get,Query } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get,Query, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AnswerService } from './answer.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { storage } from 'src/utils/imageStorage';
 
 @Controller('answers')
 export class AnswerController {
@@ -8,6 +10,11 @@ export class AnswerController {
   @Post() 
   async create(@Body() createAnswerDto: any) {
     return this.answerService.create(createAnswerDto);
+  }
+
+  @Post('upload')
+  async createImage(@Body() createAnswerDto: any) {
+    return this.answerService.createImage(createAnswerDto);
   }
 
   // Obtener historial de cuestionarios completados por el usuario
