@@ -11,6 +11,8 @@ export class QuestionnaireAnswer {
 
     @Prop({ required: true })
     date: string;
+    @Prop({ type: Object })
+    location?: { latitude: number; longitude: number }; // Campo para almacenar la ubicación
 }
 
 export const QuestionnaireAnswerSchema = SchemaFactory.createForClass(QuestionnaireAnswer);
