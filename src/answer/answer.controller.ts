@@ -11,6 +11,10 @@ export class AnswerController {
   async create(@Body() createAnswerDto: any) {
     return this.answerService.create(createAnswerDto);
   }
+  @Post('location')
+  async createLocation(@Body() createAnswerDto: any){
+    return this.answerService.createLocation(createAnswerDto);
+  }
 
   @Post('upload')
   async createImage(@Body() createAnswerDto: any) {

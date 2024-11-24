@@ -163,7 +163,25 @@ export class AnswerService {
 
     return userAnswers;
   }
-
+  async createLocation(createLocationDto: any): Promise<QuestionnaireAnswer> {
+    const { questionnaireId, location } = createLocationDto;
+  
+    // Crear un nuevo documento en la colección `questionnaireAnswer`
+    const questionnaireAnswer = new this.questionnaireAnswerModel({
+      questionnaireId: new Types.ObjectId(questionnaireId),
+      date: new Date().toISOString(), // Fecha actual
+      location: { // Guardar la ubicación
+        latitude: location.latitude,
+        longitude: location.longitude,
+      },
+    });
+  
+    // Guardar el documento en la base de datos
+    await questionnaireAnswer.save();
+  
+    return questionnaireAnswer;
+  }
+  
   async createImage(createAnswerDto: any): Promise<Answer> {
     const { questionnaireId, questionId, userId, response, observations, images } = createAnswerDto;
 
