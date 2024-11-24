@@ -18,53 +18,46 @@ export class AnswerService {
     
   ) {}
 
-  async create(createAnswerDto: any): Promise<Answer | QuestionnaireAnswer> {
-    const { questionnaireId, userId, responses, location, images } = createAnswerDto;
+  async create(createAnswerDto: any): Promise<Answer> {
+    const { questionnaireId, questionId,userId, response, observations } = createAnswerDto;
 
-    // Crear una nueva respuesta para el cuestionario
-    const createdAnswers = [];
+    // Verificar si la pregunta existe, si no, crearla
 
-    // Crear las respuestas
-    for (let response of responses) {
-      const question = await this.questionModel.findById(response.questionId).exec();
+    let question = await this.questionModel.findById(questionId).exec();
 
-      if (!question) {
-        throw new NotFoundException('Pregunta no encontrada');
-      }
-
-      const createdAnswer = new this.answerModel({
-        questionnaireAnswerId: null,
-        questionId: question._id,
-        userId: new Types.ObjectId(userId),
-        response: response.response,
-        observations: response.observations || null,
-        images, // Enviar las imágenes asociadas
-      });
-
-      await createdAnswer.save();
-      createdAnswers.push(createdAnswer);
+    if (!question) {
+      question = new this.questionModel({ _id: questionId, text: 'Nueva Pregunta', type: 'Tipo de pregunta' });
+      await question.save();
     }
 
-    // Relacionar las respuestas con el cuestionario
+    // Crear la respuesta
+    const createdAnswer = new this.answerModel({
+      questionnaireAnswerId: null, // Inicialmente null, se actualizará después
+      questionId: question._id,
+      userId: new Types.ObjectId(createAnswerDto.userId),
+      response: response,
+      observations,
+    });
+
+    // Relacionar la respuesta con el cuestionario
     const now = new Date();
-    now.setSeconds(0, 0);
+    now.setSeconds(0, 0); // Eliminar segundos y milisegundos
+
+    now.setHours(now.getHours() - 3); // Restar 5 horas a la hora actual
 
     const questionnaireAnswer = new this.questionnaireAnswerModel({
       questionnaireId: new Types.ObjectId(questionnaireId),
-      answerId: createdAnswers.map(answer => answer._id),
+      answerId: createdAnswer._id,
       date: now.toISOString(),
-      location, // Guardar la ubicación aquí
     });
 
     await questionnaireAnswer.save();
 
-    // Asignar el questionnaireAnswerId a las respuestas creadas
-    for (let answer of createdAnswers) {
-      answer.questionnaireAnswerId = questionnaireAnswer._id;
-      await answer.save();
-    }
+    // Asignar el questionnaireAnswerId al createdAnswer
+    createdAnswer.questionnaireAnswerId = questionnaireAnswer._id;
+    await createdAnswer.save();
 
-    return questionnaireAnswer;
+    return createdAnswer;
   }
 
   // Obtener historial de cuestionarios completados por un usuario
