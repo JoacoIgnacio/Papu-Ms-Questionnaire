@@ -1,7 +1,5 @@
 import { Controller, Post, Body, Param, Get,Query, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AnswerService } from './answer.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { storage } from 'src/utils/imageStorage';
 
 @Controller('answers')
 export class AnswerController {
@@ -36,4 +34,5 @@ export class AnswerController {
   ) {
     return this.answerService.getUserAnswersForQuestionnaire(userId, questionnaireId, date);
   }
+
 }

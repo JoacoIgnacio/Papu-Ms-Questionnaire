@@ -11,6 +11,7 @@ export class QuestionnaireAnswer {
 
     @Prop({ required: true })
     date: string;
+
 }
 
 export const QuestionnaireAnswerSchema = SchemaFactory.createForClass(QuestionnaireAnswer);

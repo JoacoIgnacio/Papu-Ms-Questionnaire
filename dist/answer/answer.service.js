@@ -1,15 +1,41 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnswerService = void 0;
@@ -19,8 +45,10 @@ const mongoose_2 = require("mongoose");
 const answer_schema_1 = require("./answer.schema");
 const questionnaire_schema_1 = require("../questionnaire/questionnaire.schema");
 const question_schema_1 = require("../question/question.schema");
-const fs = require('fs');
-const path = require('path');
+const inspector_1 = require("inspector");
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+const sharp_1 = __importDefault(require("sharp"));
 let AnswerService = class AnswerService {
     constructor(answerModel, questionnaireModel, questionModel, questionnaireAnswerModel) {
         this.answerModel = answerModel;
@@ -110,7 +138,7 @@ let AnswerService = class AnswerService {
         const answerIds = answers.map(answer => answer._id);
         const startDate = new Date(_date);
         const endDate = new Date(startDate);
-        endDate.setMinutes(endDate.getMinutes() + 2);
+        endDate.setSeconds(endDate.getSeconds() + 30);
         const questionnaireAnswers = await this.questionnaireAnswerModel
             .find({
             answerId: { $in: answerIds },
@@ -128,6 +156,18 @@ let AnswerService = class AnswerService {
             select: 'text type options'
         })
             .exec();
+        const imagePromises = userAnswers.map(async (answer) => {
+            if (answer.images && answer.images.length > 0) {
+                inspector_1.console.log(answer.images);
+                answer.images = await Promise.all(answer.images.map(async (imagePath) => {
+                    const relativePath = path.relative('C:\\Users\\drodr\\Desktop\\Universidad\\Web Movil\\Papu-Ms-Questionnaire', imagePath);
+                    const absolutePath = path.join(__dirname, '..', '..', relativePath);
+                    const imageBuffer = fs.readFileSync(absolutePath);
+                    return imageBuffer.toString('base64');
+                }));
+            }
+        });
+        await Promise.all(imagePromises);
         return userAnswers;
     }
     async createImage(createAnswerDto) {
@@ -145,11 +185,11 @@ let AnswerService = class AnswerService {
             images: []
         });
         if (images && images.length > 0) {
-            const uploadDir = path.join(__dirname, '..', '..', 'upload');
+            const uploadDir = path.join('upload');
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
-            createdAnswer.images = images.map((base64Image, index) => {
+            createdAnswer.images = await Promise.all(images.map(async (base64Image, index) => {
                 const matches = base64Image.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
                 if (!matches || matches.length !== 3) {
                     throw new Error('Invalid base64 image format');
@@ -158,9 +198,13 @@ let AnswerService = class AnswerService {
                 const imageType = matches[1];
                 const imageName = `${createdAnswer._id}_${index}.${imageType}`;
                 const imagePath = path.join(uploadDir, imageName);
-                fs.writeFileSync(imagePath, imageBuffer);
+                const compressedImageBuffer = await (0, sharp_1.default)(imageBuffer)
+                    .resize(800)
+                    .jpeg({ quality: 80 })
+                    .toBuffer();
+                fs.writeFileSync(imagePath, compressedImageBuffer);
                 return imagePath;
-            });
+            }));
         }
         await createdAnswer.save();
         const now = new Date();
@@ -171,9 +215,9 @@ let AnswerService = class AnswerService {
             answerId: createdAnswer._id,
             date: now.toISOString(),
         });
-        console.log(questionnaireAnswer._id);
+        inspector_1.console.log(questionnaireAnswer._id);
         await questionnaireAnswer.save();
-        console.log(questionnaireAnswer._id);
+        inspector_1.console.log(questionnaireAnswer._id);
         createdAnswer.questionnaireAnswerId = questionnaireAnswer._id;
         await createdAnswer.save();
         return createdAnswer;

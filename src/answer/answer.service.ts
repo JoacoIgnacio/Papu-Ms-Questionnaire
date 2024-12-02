@@ -5,8 +5,11 @@ import { Answer } from './answer.schema';
 import { QuestionnaireAnswer } from 'src/questionnaireAnswer/questionnaireAnswer.schema';
 import { Questionnaire } from 'src/questionnaire/questionnaire.schema';
 import { Question } from 'src/question/question.schema';
-const fs = require('fs');
-const path = require('path');
+import { console } from 'inspector';
+import * as fs from 'fs';
+import * as path from 'path';
+import sharp from 'sharp';
+
 
 @Injectable()
 export class AnswerService {
@@ -138,7 +141,7 @@ export class AnswerService {
     // Luego, encontrar los questionnaireAnswer relacionados con estas respuestas y el cuestionario específico en la fecha específica
     const startDate = new Date(_date);
     const endDate = new Date(startDate);
-    endDate.setMinutes(endDate.getMinutes() + 2);
+    endDate.setSeconds(endDate.getSeconds() + 30); // Ajustar el rango de tiempo a 30 segundos
 
     const questionnaireAnswers = await this.questionnaireAnswerModel
       .find({
@@ -156,10 +159,26 @@ export class AnswerService {
     const userAnswers = await this.answerModel
       .find({ questionnaireAnswerId: { $in: questionnaireAnswers.map(qa => qa._id) } })
       .populate({
-        path: 'questionId',
-        select: 'text type options'
+      path: 'questionId',
+      select: 'text type options'
       })
       .exec();
+
+    // Convert image paths to base64
+    const imagePromises = userAnswers.map(async answer => {
+      if (answer.images && answer.images.length > 0) {
+      console.log(answer.images);
+      answer.images = await Promise.all(answer.images.map(async imagePath => {
+        const relativePath = path.relative('C:\\Users\\drodr\\Desktop\\Universidad\\Web Movil\\Papu-Ms-Questionnaire', imagePath);
+        const absolutePath = path.join(__dirname, '..', '..', relativePath);
+        const imageBuffer = fs.readFileSync(absolutePath);
+        return imageBuffer.toString('base64');
+      }));
+      }
+    });
+
+    await Promise.all(imagePromises);
+
 
     return userAnswers;
   }
@@ -186,12 +205,12 @@ export class AnswerService {
     });
 
     if (images && images.length > 0) {
-      const uploadDir = path.join(__dirname, '..', '..', 'upload');
+      const uploadDir = path.join('upload');
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
 
-      createdAnswer.images = images.map((base64Image: string, index: number) => {
+      createdAnswer.images = await Promise.all(images.map(async (base64Image: string, index: number) => {
         const matches = base64Image.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
         if (!matches || matches.length !== 3) {
           throw new Error('Invalid base64 image format');
@@ -201,15 +220,17 @@ export class AnswerService {
         const imageType = matches[1];
         const imageName = `${createdAnswer._id}_${index}.${imageType}`;
         const imagePath = path.join(uploadDir, imageName);
-        
-        fs.writeFileSync(imagePath, imageBuffer);
+         // Comprimir la imagen utilizando sharp
+        const compressedImageBuffer = await sharp(imageBuffer)
+        .resize(800) // Redimensionar la imagen a un ancho de 800px, manteniendo la relación de aspecto
+        .jpeg({ quality: 80 }) // Comprimir la imagen a formato JPEG con calidad 80
+        .toBuffer();
+            
+        fs.writeFileSync(imagePath, compressedImageBuffer);
 
         return imagePath;
-      });
+      }));
     }
-    
-
-   
 
     await createdAnswer.save();
 
@@ -236,4 +257,8 @@ export class AnswerService {
 
     return createdAnswer;
   }
+
+
+
 }
+
