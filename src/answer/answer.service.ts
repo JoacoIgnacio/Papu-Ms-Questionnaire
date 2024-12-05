@@ -164,21 +164,21 @@ export class AnswerService {
       })
       .exec();
 
-    // Convert image paths to base64
-    const imagePromises = userAnswers.map(async answer => {
-      if (answer.images && answer.images.length > 0) {
-      console.log(answer.images);
-      answer.images = await Promise.all(answer.images.map(async imagePath => {
-        const relativePath = path.relative('C:\\Users\\drodr\\Desktop\\Universidad\\Web Movil\\Papu-Ms-Questionnaire', imagePath);
-        const absolutePath = path.join(__dirname, '..', '..', relativePath);
-        const imageBuffer = fs.readFileSync(absolutePath);
-        return imageBuffer.toString('base64');
-      }));
+      try{
+        const imagePromises = userAnswers.map(async answer => {
+          if (answer.images && answer.images.length > 0) {
+            console.log(answer.images);
+            answer.images = await Promise.all(answer.images.map(async imagePath => {
+              const absolutePath = path.resolve(imagePath);
+              const imageBuffer = fs.readFileSync(absolutePath);
+              return imageBuffer.toString('base64');
+            }));
+          }
+        });
+        await Promise.all(imagePromises);
+      }catch(error){
+        console.log(error);
       }
-    });
-
-    await Promise.all(imagePromises);
-
 
     return userAnswers;
   }
