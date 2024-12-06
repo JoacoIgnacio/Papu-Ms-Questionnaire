@@ -1,0 +1,5 @@
+POST http://localhost:3000/user-machine/ID-User/675123ee2ecee9fa87d7f42d
+
+Get  http://localhost:3000/user-machine/user/:userId
+
+Get http://localhost:3000/user-machine/user/66f4d1dfc082481578b4b05a
